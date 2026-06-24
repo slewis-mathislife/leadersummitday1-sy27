@@ -336,6 +336,31 @@
   @media (prefers-reduced-motion:reduce){ .shout-intro .spk,.vblock h4::before{animation:none;} }
   @media print{ .shout-intro .spk,.vblock h4::before{animation:none;} }
 
+
+  .summit{position:sticky;top:0;z-index:40;}
+  #day1,#day2{scroll-margin-top:112px;}
+
+
+  /* SOMETHING NICE popup */
+  .surprise-wrap{text-align:center;margin:30px 0 4px;}
+  .surprise-lead{font-size:15px;color:var(--muted);margin-bottom:12px;}
+  .surprise-btn{appearance:none;border:none;cursor:pointer;font-family:inherit;background:linear-gradient(120deg,var(--carolina),var(--navy));color:#fff;font-weight:800;letter-spacing:.03em;font-size:15px;padding:14px 28px;border-radius:999px;box-shadow:0 6px 20px rgba(75,156,211,.3);transition:transform .15s ease,box-shadow .2s ease;animation:pulseglow 2.4s ease-in-out infinite;-webkit-tap-highlight-color:transparent;}
+  .surprise-btn:hover{transform:translateY(-1px);}
+  .surprise-btn:active{transform:scale(.97);}
+  @keyframes pulseglow{0%,100%{box-shadow:0 6px 18px rgba(75,156,211,.28);}50%{box-shadow:0 8px 30px rgba(75,156,211,.6);}}
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,34,64,.55);display:none;align-items:center;justify-content:center;z-index:80;padding:24px;}
+  .modal-overlay.show{display:flex;animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0;}to{opacity:1;}}
+  .modal-card{position:relative;background:#fff;border-radius:16px;max-width:430px;width:100%;padding:36px 28px 26px;text-align:center;box-shadow:0 30px 70px rgba(10,34,64,.4);animation:popin .3s ease;}
+  @keyframes popin{from{transform:scale(.92);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .modal-close{position:absolute;top:8px;right:14px;background:none;border:none;font-size:28px;line-height:1;color:var(--muted);cursor:pointer;}
+  .modal-spk{font-size:30px;color:#E0A93B;animation:twinkle 1.6s ease-in-out infinite;}
+  .modal-text{font-size:19px;line-height:1.45;color:var(--navy);font-weight:600;margin:12px 0 22px;}
+  .modal-again{appearance:none;border:1.5px solid var(--carolina);background:#fff;color:var(--navy);font-family:inherit;font-weight:700;font-size:13.5px;padding:9px 18px;border-radius:999px;cursor:pointer;transition:all .18s ease;}
+  .modal-again:hover{background:var(--carolina);color:#fff;}
+  @media (prefers-reduced-motion:reduce){ .surprise-btn{animation:none;} .modal-spk{animation:none;} .modal-overlay.show,.modal-card{animation:none;} }
+  @media print{ .surprise-wrap,.modal-overlay{display:none !important;} }
+
 </style>
 </head>
 <body>
@@ -484,6 +509,20 @@
         <p class="shout"><b>Pat &rarr; Darla</b> for being FUN. Your lightheartedness is needed when times are stressful.</p>
         <p class="shout"><b>Tamar &rarr; Sharmaine</b> for modeling excellence through her cute little website, but also bringing FUN to it. Expressing optimism and gratitude for the team.</p>
         <p class="shout"><b>Sharmaine &rarr; April</b> you and your breakout won the trivia game, and you brought the joy that keeps this work sustainable. You also made sure to introduce us to your counterpart from KIPP Camden, widening our circle. That is FUN and TEAM in one.</p>
+      </div>
+
+      <div class="surprise-wrap">
+        <p class="surprise-lead">You made it all the way through. One more thing, just for you.</p>
+        <button class="surprise-btn" id="surpriseBtn" type="button">Tap here before you go &#10022;</button>
+      </div>
+
+      <div class="modal-overlay" id="niceModal" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-label="A note for you">
+          <button class="modal-close" id="niceClose" aria-label="Close">&times;</button>
+          <div class="modal-spk">&#10022;</div>
+          <p class="modal-text" id="niceText"></p>
+          <button class="modal-again" id="niceAgain" type="button">Tell me another</button>
+        </div>
       </div>
 
     </section>
@@ -708,6 +747,38 @@
       h.addEventListener('click', function(){ h.parentElement.classList.toggle('open'); });
       h.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); h.parentElement.classList.toggle('open'); } });
     });
+
+    // Day 2: "something nice" popup
+    var niceNotes = [
+      "You said the hard thing this week, with care. That takes a courage most people never find. This house is stronger because you are in it.",
+      "You hold the bar high and you hold people gently at the same time. That balance is rare. Do not lose it.",
+      "You are the kind of teammate someone is quietly grateful for tonight, even if they did not say it out loud.",
+      "Your honesty is a gift, not a risk. Keep handing it over.",
+      "You make this a place people run toward. That is not a small thing.",
+      "You looked in the mirror before you reached for the magnifying glass. That is what excellence actually looks like.",
+      "You belong here, fully. Not because you are perfect, but because you keep choosing the team.",
+      "Someone grew this week because you were willing to walk them through your thinking. That is real coaching.",
+      "When you were exhausted, you still showed up and did the work. That is who you are when it counts.",
+      "You are still chasing the ideal, and the fact that you have not stopped is the whole point."
+    ];
+    var nm = document.getElementById('niceModal');
+    var nt = document.getElementById('niceText');
+    var sb = document.getElementById('surpriseBtn');
+    var nc = document.getElementById('niceClose');
+    var na = document.getElementById('niceAgain');
+    var lastIdx = -1;
+    function pickNote(){
+      var i = Math.floor(Math.random()*niceNotes.length);
+      if(niceNotes.length>1){ while(i===lastIdx){ i = Math.floor(Math.random()*niceNotes.length); } }
+      lastIdx = i; return niceNotes[i];
+    }
+    function openNice(){ if(nt) nt.textContent = pickNote(); if(nm){ nm.classList.add('show'); nm.setAttribute('aria-hidden','false'); } }
+    function closeNice(){ if(nm){ nm.classList.remove('show'); nm.setAttribute('aria-hidden','true'); } }
+    if(sb) sb.addEventListener('click', openNice);
+    if(nc) nc.addEventListener('click', closeNice);
+    if(na) na.addEventListener('click', function(){ if(nt) nt.textContent = pickNote(); });
+    if(nm) nm.addEventListener('click', function(e){ if(e.target===nm) closeNice(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeNice(); });
 
   })();
   </script>
